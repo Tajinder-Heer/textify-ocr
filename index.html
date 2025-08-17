@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textify - Image to Text OCR</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/tesseract.js@v5.1.0/dist/tesseract.min.js"></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <h1>Textify: Image to Text OCR</h1>
+    <p>Upload an image with Punjabi text to extract text.</p>
+    <input type="file" id="upload" accept="image/*">
+    <button id="process">Extract Text</button>
+    <div id="loading" style="display: none;">Processing... Please wait.</div>
+    <div id="result"></div>
+</body>
+</html>
