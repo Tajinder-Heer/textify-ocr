@@ -24,7 +24,7 @@ function preprocessImage(file, callback) {
 
             // Thresholding
             for (let i = 0; i < data.length; i += 4) {
-                const threshold = 64; // Adjustable
+                const threshold = 128; // Adjustable
                 const value = data[i] < threshold ? 0 : 255;
                 data[i] = data[i + 1] = data[i + 2] = value;
             }
