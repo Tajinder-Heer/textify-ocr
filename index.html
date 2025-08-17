@@ -6,14 +6,20 @@
     <title>Textify - Image to Text OCR</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/tesseract.js@v5.1.0/dist/tesseract.min.js"></script>
-    <script src="script.js" defer></script>
+    <script src="preprocess.js" defer></script>
+    <script src="ocr.js" defer></script>
+    <script src="metrics.js" defer></script>
+    <script src="main.js" defer></script>
 </head>
 <body>
     <h1>Textify: Image to Text OCR</h1>
     <p>Upload an image with Punjabi text to extract text.</p>
     <input type="file" id="upload" accept="image/*">
+    <label><input type="checkbox" id="preprocess" checked> Enable Preprocessing</label>
+    <textarea id="groundTruth" placeholder="Enter ground truth text for accuracy (optional)"></textarea>
     <button id="process">Extract Text</button>
     <div id="loading" style="display: none;">Processing... Please wait.</div>
     <div id="result"></div>
+    <div id="accuracy"></div>
 </body>
 </html>

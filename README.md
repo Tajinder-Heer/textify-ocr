@@ -1,27 +1,39 @@
 Textify: Image to Text OCR App
 Textify is a client-side web app for extracting text from images using Tesseract.js. Focus: High-accuracy OCR for Punjabi (Gurmukhi), Hindi (Devanagari), and English (Latin). Built for a small internal user base with zero budget.
-Phase 1: MVP
+Phase 1: MVP (Complete)
 
 Features: Upload image, extract Punjabi text, display results.
-Tech: HTML, JS (Tesseract.js via CDN), CSS.
-Structure: Modular with separate index.html, styles.css, script.js.
-Usage: Open via GitHub Pages, upload a Punjabi image, click "Extract Text".
+Accuracy: ~60% on printed Punjabi text.
+
+Phase 2: Modular Preprocessing and Accuracy Metrics
+
+Features:
+Modular preprocessing (grayscale, thresholding, resizing) in preprocess.js.
+OCR in ocr.js.
+Levenshtein distance accuracy metric in metrics.js.
+Main logic in main.js.
+
+
+Tech: HTML, JS (Tesseract.js, Canvas API), CSS.
+Structure: Modular with separate JS files for each feature.
+Usage: Open via GitHub Pages, upload a Punjabi image, toggle preprocessing, enter ground truth (optional), click "Extract Text".
 Hosting: GitHub Pages (username.github.io/textify-ocr).
+Target: 80%+ accuracy on clear printed text.
 
 Future Phases
 
-Phase 2: Add image preprocessing (e.g., Canvas API) for better accuracy.
-Phase 3: Support Hindi and English; enhance UI (e.g., Bootstrap).
+Phase 3: Add Hindi/English support; implement formatting detection (paragraphs/lines) using HOCR in a new format.js module; add Bootstrap UI.
 Phase 4: Fine-tune Tesseract models for Punjabi; optimize performance.
 
 Setup Instructions
 
 Clone or access repo: https://github.com/<your-username>/textify-ocr.
 Open index.html via GitHub Pages or locally.
-Upload a clear Punjabi image (printed text recommended).
+Upload a clear Punjabi image; optionally enter ground truth text for accuracy.
 
 Testing
 
-Test with 5-10 Punjabi images.
+Test with 10-15 Punjabi images (varied quality).
 Check console for logs (F12 > Console).
-Target: 70%+ accuracy on clear printed text.
+Target: 80%+ accuracy with preprocessing (vs. 60% in Phase 1).
+Use ground truth text to see Levenshtein accuracy in the UI.
