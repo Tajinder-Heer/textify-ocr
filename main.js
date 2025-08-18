@@ -1,5 +1,6 @@
 const upload = document.getElementById('upload');
 const preprocessCheckbox = document.getElementById('preprocess');
+const blurCheckbox = document.getElementById('blur');
 const debugCheckbox = document.getElementById('debug');
 const groundTruthInput = document.getElementById('groundTruth');
 const processBtn = document.getElementById('process');
@@ -27,7 +28,7 @@ processBtn.addEventListener('click', async () => {
     try {
         let input = selectedFile;
         if (preprocessCheckbox.checked) {
-            preprocessImage(input, async (blob) => {
+            preprocessImage(input, blurCheckbox.checked, async (blob) => {
                 try {
                     if (debugCheckbox.checked) {
                         debugImage.src = URL.createObjectURL(blob);
