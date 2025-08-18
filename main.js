@@ -1,10 +1,12 @@
 const upload = document.getElementById('upload');
 const preprocessCheckbox = document.getElementById('preprocess');
+const debugCheckbox = document.getElementById('debug');
 const groundTruthInput = document.getElementById('groundTruth');
 const processBtn = document.getElementById('process');
 const result = document.getElementById('result');
 const accuracy = document.getElementById('accuracy');
 const loading = document.getElementById('loading');
+const debugImage = document.getElementById('debugImage');
 
 let selectedFile = null;
 
@@ -20,13 +22,17 @@ processBtn.addEventListener('click', async () => {
     loading.style.display = 'block';
     result.innerText = '';
     accuracy.innerText = '';
+    debugImage.style.display = 'none';
 
     try {
         let input = selectedFile;
         if (preprocessCheckbox.checked) {
-            // Preprocess image
             preprocessImage(input, async (blob) => {
                 try {
+                    if (debugCheckbox.checked) {
+                        debugImage.src = URL.createObjectURL(blob);
+                        debugImage.style.display = 'block';
+                    }
                     const text = await performOCR(blob, 'pan');
                     result.innerText = text || 'No text detected.';
                     if (groundTruthInput.value) {
@@ -41,7 +47,6 @@ processBtn.addEventListener('click', async () => {
                 }
             });
         } else {
-            // No preprocessing
             const text = await performOCR(input, 'pan');
             result.innerText = text || 'No text detected.';
             if (groundTruthInput.value) {

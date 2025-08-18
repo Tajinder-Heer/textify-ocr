@@ -49,3 +49,7 @@ button:hover {
     color: #007bff;
     font-weight: bold;
 }
+
+#debugImage {
+    border: 1px solid #ccc;
+}

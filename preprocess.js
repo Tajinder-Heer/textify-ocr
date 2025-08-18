@@ -7,10 +7,13 @@ function preprocessImage(file, callback) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // Resize to ~300 DPI (1 inch = 300px)
-            const maxWidth = 1200;
-            const scale = maxWidth / img.width;
-            canvas.width = maxWidth;
+            // Dynamic resizing (preserve aspect ratio, target ~300 DPI)
+            const maxDimension = 1200;
+            let scale = 1;
+            if (img.width > maxDimension || img.height > maxDimension) {
+                scale = Math.min(maxDimension / img.width, maxDimension / img.height);
+            }
+            canvas.width = img.width * scale;
             canvas.height = img.height * scale;
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
@@ -22,9 +25,10 @@ function preprocessImage(file, callback) {
                 data[i] = data[i + 1] = data[i + 2] = avg;
             }
 
-            // Thresholding
+            // Adaptive thresholding
+            const brightness = data.reduce((sum, val, i) => i % 4 === 0 ? sum + val : sum, 0) / (data.length / 4);
+            const threshold = brightness * 0.7; // Adjust based on image brightness
             for (let i = 0; i < data.length; i += 4) {
-                const threshold = 128; // Adjustable
                 const value = data[i] < threshold ? 0 : 255;
                 data[i] = data[i + 1] = data[i + 2] = value;
             }

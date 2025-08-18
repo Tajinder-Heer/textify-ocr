@@ -16,9 +16,11 @@
     <p>Upload an image with Punjabi text to extract text.</p>
     <input type="file" id="upload" accept="image/*">
     <label><input type="checkbox" id="preprocess" checked> Enable Preprocessing</label>
+    <label><input type="checkbox" id="debug"> Show Preprocessed Image</label>
     <textarea id="groundTruth" placeholder="Enter ground truth text for accuracy (optional)"></textarea>
     <button id="process">Extract Text</button>
     <div id="loading" style="display: none;">Processing... Please wait.</div>
+    <img id="debugImage" style="display: none; max-width: 100%; margin-top: 20px;">
     <div id="result"></div>
     <div id="accuracy"></div>
 </body>
