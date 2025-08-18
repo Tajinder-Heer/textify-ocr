@@ -4,24 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Textify - Image to Text OCR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://docs.opencv.org/4.5.0/opencv.js" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.338/pdf.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@v5.1.0/dist/tesseract.min.js"></script>
+    <script src="pdf_handler.js" defer></script>
     <script src="preprocess.js" defer></script>
     <script src="ocr.js" defer></script>
+    <script src="format.js" defer></script>
     <script src="metrics.js" defer></script>
     <script src="main.js" defer></script>
 </head>
 <body>
-    <h1>Textify: Image to Text OCR</h1>
-    <p>Upload an image with Punjabi text to extract text.</p>
-    <input type="file" id="upload" accept="image/*">
-    <label><input type="checkbox" id="preprocess" checked> Enable Preprocessing</label>
-    <label><input type="checkbox" id="debug"> Show Preprocessed Image</label>
-    <textarea id="groundTruth" placeholder="Enter ground truth text for accuracy (optional)"></textarea>
-    <button id="process">Extract Text</button>
-    <div id="loading" style="display: none;">Processing... Please wait.</div>
-    <img id="debugImage" style="display: none; max-width: 100%; margin-top: 20px;">
-    <div id="result"></div>
-    <div id="accuracy"></div>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header"><h3>Textify: Image to Text OCR</h3></div>
+            <div class="card-body">
+                <p>Upload an image or PDF with text (Punjabi/Hindi/English).</p>
+                <input type="file" id="upload" accept="image/*,.pdf" class="form-control mb-2">
+                <select id="lang" class="form-select mb-2">
+                    <option value="pan">Punjabi</option>
+                    <option value="hin">Hindi</option>
+                    <option value="eng">English</option>
+                    <option value="pan+hin+eng">Multi-Language</option>
+                </select>
+                <label class="form-check-label"><input type="checkbox" id="preprocess" checked class="form-check-input"> Enable Preprocessing (Deskew/Dewarp)</label>
+                <label class="form-check-label"><input type="checkbox" id="debug" class="form-check-input"> Show Preprocessed Image</label>
+                <textarea id="groundTruth" placeholder="Enter ground truth text for accuracy (optional)" class="form-control mb-2"></textarea>
+                <button id="process" class="btn btn-primary">Extract Text</button>
+                <div id="loading" class="mt-2 d-none">Processing... <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%;"></div></div></div>
+                <img id="debugImage" class="img-fluid mt-2 d-none">
+                <div id="result" class="mt-2 p-3 border bg-light" style="white-space: pre-wrap;"></div>
+                <div id="accuracy" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
