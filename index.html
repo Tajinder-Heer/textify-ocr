@@ -3,31 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Textify - Image to Text OCR</title>
+    <title>Textify - Image & PDF to Text OCR</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Gurmukhi:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+<<<<<<< HEAD
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.3/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+=======
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.3/dist/tesseract.min.js"></script>
+>>>>>>> fd2235a51a82d11f8282c107d9eb2cde32d6f8e1
     <script src="preprocess.js" defer></script>
     <script src="ocr.js" defer></script>
     <script src="metrics.js" defer></script>
     <script src="main.js" defer></script>
 </head>
 <body>
+<<<<<<< HEAD
+    <div class="container">
+        <header>
+            <h1>Textify-OCR</h1>
+            <p class="subtitle">High Performance Punjabi Text Extraction from Images & PDFs</p>
+        </header>
+        
+=======
     <div class="container">
         <header>
             <h1>Textify-OCR</h1>
             <p class="subtitle">High Performance Punjabi Text Extraction</p>
         </header>
         
+>>>>>>> fd2235a51a82d11f8282c107d9eb2cde32d6f8e1
         <div class="card">
+<<<<<<< HEAD
+            <h2 class="card-title">Upload Image or PDF</h2>
+            <div class="upload-area" id="dropZone">
+                <i>📷📄</i>
+                <p>Drag & drop your Punjabi text image or PDF here or click to browse</p>
+                <button class="btn" id="browseBtn">Browse Files</button>
+                <input type="file" id="fileInput" accept="image/*,application/pdf" style="display: none;">
+=======
             <h2 class="card-title">Upload Image</h2>
             <div class="upload-area" id="dropZone">
                 <i>📷</i>
                 <p>Drag & drop your Punjabi text image here or click to browse</p>
                 <button class="btn" id="browseBtn">Browse Files</button>
                 <input type="file" id="fileInput" accept="image/*" style="display: none;">
+>>>>>>> fd2235a51a82d11f8282c107d9eb2cde32d6f8e1
             </div>
+<<<<<<< HEAD
+            
+            <div class="form-check mb-3">
+                <input type="checkbox" id="preprocess" class="form-check-input" checked>
+                <label class="form-check-label" for="preprocess">Enable Preprocessing (recommended for images/scanned PDFs)</label>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" id="blur" class="form-check-input">
+                <label class="form-check-label" for="blur">Apply Blur (slower, better for noisy images/PDFs)</label>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" id="debug" class="form-check-input">
+                <label class="form-check-label" for="debug">Show Preprocessed Image (for images/scanned PDFs)</label>
+            </div>
+            <textarea id="groundTruth" class="form-control mb-3" placeholder="Enter ground truth text for accuracy (optional)"></textarea>
+            
+            <div class="optimization-tips">
+                <h3>Tips for Better Results</h3>
+                <ul>
+                    <li>Use images/PDFs with clear, high-contrast text</li>
+                    <li>Crop images to include only the text region</li>
+                    <li>Recommended resolution: 300 DPI for images, single-page PDFs</li>
+                    <li>File formats: PNG, JPG, BMP, or PDF</li>
+                    <li>Good lighting reduces processing time</li>
+                </ul>
+            </div>
+            
+            <button class="btn btn-process" id="processBtn" disabled>Process File & Extract Text</button>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="status">
+                    <span id="progressText">Waiting for file...</span>
+                    <span id="timeEstimate"></span>
+                </div>
+            </div>
+=======
             
             <div class="form-check mb-3">
                 <input type="checkbox" id="preprocess" class="form-check-input" checked>
@@ -65,7 +127,39 @@
                     <span id="timeEstimate"></span>
                 </div>
             </div>
+>>>>>>> fd2235a51a82d11f8282c107d9eb2cde32d6f8e1
         </div>
+<<<<<<< HEAD
+        
+        <div class="card">
+            <h2 class="card-title">Preview</h2>
+            <div class="preview-container">
+                <div class="image-preview">
+                    <img id="previewImage" src="" alt="Your image or PDF page will appear here">
+                    <img id="debugImage" src="" alt="Preprocessed image" class="d-none">
+                </div>
+                <div class="text-preview">
+                    <p id="previewText" class="panjabi-text">Extracted text will appear here...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card results">
+            <h2 class="card-title">Extracted Text</h2>
+            <div class="text-output panjabi-text" id="outputText"></div>
+            <div id="accuracy" class="mt-2"></div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-copy" id="copyBtn" style="display: none;">Copy Text</button>
+                <button class="btn btn-download" id="downloadBtn" style="display: none;">Download as Text</button>
+                <button class="btn btn-clear" id="clearBtn">Clear All</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Textify-OCR v2.2 | Optimized for Punjabi Text Extraction from Images & PDFs</p>
+        </footer>
+=======
         
         <div class="card">
             <h2 class="card-title">Preview</h2>
@@ -95,6 +189,7 @@
         <footer>
             <p>Textify-OCR v2.1 | Optimized for Punjabi Text Extraction</p>
         </footer>
+>>>>>>> fd2235a51a82d11f8282c107d9eb2cde32d6f8e1
     </div>
 
     <div class="notification" id="notification"></div>
