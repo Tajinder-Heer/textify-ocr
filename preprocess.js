@@ -7,10 +7,12 @@ function preprocessImage(file, callback) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // Conditional upscale (only if low-res, <600px)
+            // Cap image size (max 900px width)
             let scale = 1;
-            if (img.width < 600) {
-                scale = Math.min(1.5, 900 / img.width);
+            if (img.width > 900) {
+                scale = 900 / img.width;
+            } else if (img.width < 600) {
+                scale = 1.2; // Reduced from 1.5
             }
             canvas.width = img.width * scale;
             canvas.height = img.height * scale;
@@ -28,11 +30,7 @@ function preprocessImage(file, callback) {
                 data[i] = data[i + 1] = data[i + 2] = avg;
             }
 
-            // Minimal Gaussian blur (0.3px)
-            ctx.filter = 'blur(0.3px)';
-            ctx.putImageData(imageData, 0, 0);
-            ctx.filter = 'none';
-
+            // Skip blur for faster processing
             // Otsu's adaptive thresholding
             const threshold = otsuThreshold(imageData);
             for (let i = 0; i < data.length; i += 4) {
@@ -41,7 +39,6 @@ function preprocessImage(file, callback) {
             }
             ctx.putImageData(imageData, 0, 0);
 
-            // Convert to blob
             canvas.toBlob(callback, 'image/png');
         };
     };
