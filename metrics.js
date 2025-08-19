@@ -6,9 +6,9 @@ function calculateLevenshteinDistance(a, b) {
         for (let i = 1; i <= a.length; i++) {
             const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
             matrix[j][i] = Math.min(
-                matrix[j][i - 1] + 1, // Deletion
-                matrix[j - 1][i] + 1, // Insertion
-                matrix[j - 1][i - 1] + indicator // Substitution
+                matrix[j][i - 1] + 1,
+                matrix[j - 1][i] + 1,
+                matrix[j - 1][i - 1] + indicator
             );
         }
     }

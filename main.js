@@ -1,5 +1,4 @@
 const upload = document.getElementById('upload');
-const langSelect = document.getElementById('lang');
 const preprocessCheckbox = document.getElementById('preprocess');
 const debugCheckbox = document.getElementById('debug');
 const groundTruthInput = document.getElementById('groundTruth');
@@ -17,46 +16,48 @@ upload.addEventListener('change', (e) => {
 
 processBtn.addEventListener('click', async () => {
     if (!selectedFile) {
-        alert('Please upload an image or PDF first.');
+        alert('Please upload an image first.');
         return;
     }
-    loading.classList.remove('d-none');
-    result.innerHTML = '';
+    loading.style.display = 'block';
+    result.innerText = '';
     accuracy.innerText = '';
     debugImage.style.display = 'none';
 
     try {
-        const lang = langSelect.value;
-        let inputs = [];
-        if (selectedFile.type === 'application/pdf') {
-            inputs = await handlePDF(selectedFile); // Get array of page blobs
-        } else {
-            inputs = [selectedFile];
-        }
-
-        let fullText = '';
-        for (let i = 0; i < inputs.length; i++) {
-            let processedInput = inputs[i];
-            if (preprocessCheckbox.checked) {
-                processedInput = await new Promise(resolve => preprocessImage(inputs[i], resolve));
-                if (debugCheckbox.checked && i === 0) { // Show first page/image only
-                    debugImage.src = URL.createObjectURL(processedInput);
-                    debugImage.style.display = 'block';
+        let input = selectedFile;
+        if (preprocessCheckbox.checked) {
+            preprocessImage(input, async (blob) => {
+                try {
+                    if (debugCheckbox.checked) {
+                        debugImage.src = URL.createObjectURL(blob);
+                        debugImage.style.display = 'block';
+                    }
+                    const text = await performOCR(blob, 'pan');
+                    result.innerText = text || 'No text detected.';
+                    if (groundTruthInput.value) {
+                        const acc = calculateLevenshteinAccuracy(groundTruthInput.value, text);
+                        accuracy.innerText = `Accuracy: ${acc.toFixed(2)}%`;
+                    }
+                } catch (error) {
+                    console.error('OCR Error:', error);
+                    alert('Error processing image. Check console.');
+                } finally {
+                    loading.style.display = 'none';
                 }
+            });
+        } else {
+            const text = await performOCR(input, 'pan');
+            result.innerText = text || 'No text detected.';
+            if (groundTruthInput.value) {
+                const acc = calculateLevenshteinAccuracy(groundTruthInput.value, text);
+                accuracy.innerText = `Accuracy: ${acc.toFixed(2)}%`;
             }
-            const rawText = await performOCR(processedInput, lang);
-            const formattedText = formatHOCR(rawText); // Parse HOCR to HTML
-            fullText += `<h5>Page ${i + 1}</h5>${formattedText}<hr>`;
-        }
-        result.innerHTML = fullText || '<p>No text detected.</p>';
-        if (groundTruthInput.value) {
-            const acc = calculateLevenshteinAccuracy(groundTruthInput.value, fullText.replace(/<[^>]+>/g, '')); // Strip HTML
-            accuracy.innerText = `Accuracy: ${acc.toFixed(2)}%`;
+            loading.style.display = 'none';
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error processing file. Check console.');
-    } finally {
-        loading.classList.add('d-none');
+        alert('Error processing image. Check console.');
+        loading.style.display = 'none';
     }
 });
