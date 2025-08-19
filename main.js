@@ -1,42 +1,136 @@
-const upload = document.getElementById('upload');
+const fileInput = document.getElementById('fileInput');
+const browseBtn = document.getElementById('browseBtn');
+const dropZone = document.getElementById('dropZone');
+const processBtn = document.getElementById('processBtn');
+const previewImage = document.getElementById('previewImage');
+const debugImage = document.getElementById('debugImage');
+const previewText = document.getElementById('previewText');
+const outputText = document.getElementById('outputText');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const timeEstimate = document.getElementById('timeEstimate');
+const copyBtn = document.getElementById('copyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const clearBtn = document.getElementById('clearBtn');
+const notification = document.getElementById('notification');
 const preprocessCheckbox = document.getElementById('preprocess');
 const blurCheckbox = document.getElementById('blur');
 const debugCheckbox = document.getElementById('debug');
 const groundTruthInput = document.getElementById('groundTruth');
-const processBtn = document.getElementById('process');
-const result = document.getElementById('result');
 const accuracy = document.getElementById('accuracy');
-const loading = document.getElementById('loading');
-const errorDiv = document.getElementById('error');
-const debugImage = document.getElementById('debugImage');
 
 let selectedFile = null;
 let debugBlobUrl = null;
 
-upload.addEventListener('change', (e) => {
-    selectedFile = e.target.files[0];
+// Initialize Tesseract worker
+let worker = null;
+async function initializeWorker() {
+    try {
+        console.time('Tesseract Initialization');
+        worker = await Tesseract.createWorker({
+            langPath: './', // Local traineddata
+            logger: m => {
+                console.log(m.status, m.progress);
+                updateProgress(m);
+            }
+        });
+        await worker.load();
+        await worker.loadLanguage('pan');
+        await worker.initialize('pan');
+        console.timeEnd('Tesseract Initialization');
+        console.log('Worker initialized');
+    } catch (err) {
+        console.error('Failed to initialize worker:', err);
+        showNotification('Failed to initialize OCR engine: ' + err.message, 'error');
+    }
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+    initializeWorker();
 });
 
-processBtn.addEventListener('click', async () => {
-    if (!selectedFile) {
-        errorDiv.textContent = 'Please upload an image first.';
-        errorDiv.classList.remove('d-none');
-        return;
+// Browse button event
+browseBtn.addEventListener('click', () => {
+    fileInput.click();
+});
+
+// File input change event
+fileInput.addEventListener('change', handleFileSelect);
+
+// Drop zone events
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.backgroundColor = 'rgba(93, 156, 236, 0.1)';
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.style.backgroundColor = '';
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.style.backgroundColor = '';
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelect(e);
     }
+});
+
+// Process button event
+processBtn.addEventListener('click', processImage);
+
+// Copy button event
+copyBtn.addEventListener('click', copyText);
+
+// Download button event
+downloadBtn.addEventListener('click', downloadText);
+
+// Clear button event
+clearBtn.addEventListener('click', clearAll);
+
+function handleFileSelect(e) {
+    selectedFile = fileInput.files[0];
+    if (selectedFile) {
+        if (!selectedFile.type.match('image.*')) {
+            showNotification('Please select an image file.', 'error');
+            return;
+        }
+        console.log('Input image:', selectedFile.name, 'Size:', selectedFile.size, 'bytes', 'Type:', selectedFile.type);
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            if (debugBlobUrl) {
+                URL.revokeObjectURL(debugBlobUrl);
+                debugBlobUrl = null;
+                debugImage.src = '';
+                debugImage.classList.add('d-none');
+            }
+        };
+        reader.readAsDataURL(selectedFile);
+        // Enable process button
+        processBtn.disabled = false;
+        progressText.textContent = 'Ready to process';
+        timeEstimate.textContent = 'Estimated time: 2-5 seconds';
+        showNotification('Image loaded successfully. Click Process to extract text.', 'success');
+    }
+}
+
+async function processImage() {
+    if (!selectedFile || !worker) return;
     console.log('Preprocessing enabled:', preprocessCheckbox.checked);
     console.log('Debug enabled:', debugCheckbox.checked);
     console.log('Blur enabled:', blurCheckbox.checked);
-    console.log('Input image:', selectedFile.name, 'Size:', selectedFile.size, 'bytes', 'Type:', selectedFile.type);
-    loading.classList.remove('d-none');
-    errorDiv.classList.add('d-none');
-    result.innerText = '';
-    accuracy.innerText = '';
-    debugImage.style.display = 'none';
-    if (debugBlobUrl) {
-        URL.revokeObjectURL(debugBlobUrl);
-        debugBlobUrl = null;
-    }
-
+    // Reset UI
+    progressBar.style.width = '0%';
+    progressText.textContent = 'Processing image...';
+    previewText.textContent = 'Processing...';
+    outputText.textContent = '';
+    accuracy.textContent = '';
+    processBtn.disabled = true;
+    copyBtn.style.display = 'none';
+    downloadBtn.style.display = 'none';
     try {
         console.time('Total Processing');
         let input = selectedFile;
@@ -57,7 +151,7 @@ processBtn.addEventListener('click', async () => {
             if (debugCheckbox.checked && input) {
                 debugBlobUrl = URL.createObjectURL(input);
                 debugImage.src = debugBlobUrl;
-                debugImage.style.display = 'block';
+                debugImage.classList.remove('d-none');
                 requestAnimationFrame(() => {
                     debugImage.dispatchEvent(new Event('load'));
                     console.log('Debug image set, URL:', debugBlobUrl);
@@ -67,17 +161,100 @@ processBtn.addEventListener('click', async () => {
         console.time('OCR');
         const text = await performOCR(input, 'pan');
         console.timeEnd('OCR');
-        result.innerText = text || 'No text detected.';
+        // Display results
+        previewText.textContent = text || 'No text detected.';
+        outputText.textContent = text || 'No text detected.';
+        // Show action buttons
+        copyBtn.style.display = 'inline-flex';
+        downloadBtn.style.display = 'inline-flex';
         if (groundTruthInput.value) {
             const acc = calculateLevenshteinAccuracy(groundTruthInput.value, text);
-            accuracy.innerText = `Accuracy: ${acc.toFixed(2)}%`;
+            accuracy.textContent = `Accuracy: ${acc.toFixed(2)}%`;
         }
         console.timeEnd('Total Processing');
-    } catch (error) {
-        console.error('Error:', error);
-        errorDiv.textContent = 'Error processing image: ' + error.message;
-        errorDiv.classList.remove('d-none');
+        showNotification('Text extraction completed successfully!', 'success');
+    } catch (err) {
+        console.error('Error:', err);
+        progressText.textContent = 'Error processing image';
+        showNotification('Error: ' + err.message, 'error');
     } finally {
-        loading.classList.add('d-none');
+        processBtn.disabled = false;
     }
-});
+}
+
+function updateProgress(progress) {
+    if (progress.status === 'recognizing text') {
+        const percent = Math.floor(progress.progress * 100);
+        progressBar.style.width = percent + '%';
+        progressText.textContent = `Processing: ${percent}%`;
+        if (percent < 95) {
+            const remaining = Math.round((100 - percent) / 5);
+            timeEstimate.textContent = `Estimated time remaining: ${remaining}s`;
+        } else {
+            timeEstimate.textContent = 'Finishing up...';
+        }
+    }
+}
+
+function copyText() {
+    const text = outputText.textContent;
+    if (!text || text.trim() === '') {
+        showNotification('No text to copy', 'error');
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        showNotification('Text copied to clipboard!', 'success');
+    }).catch(err => {
+        showNotification('Failed to copy text: ' + err.message, 'error');
+    });
+}
+
+function downloadText() {
+    const text = outputText.textContent;
+    if (!text || text.trim() === '') {
+        showNotification('No text to download', 'error');
+        return;
+    }
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'punjabi-text.txt';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+    showNotification('Text downloaded successfully!', 'success');
+}
+
+function clearAll() {
+    fileInput.value = '';
+    previewImage.src = '';
+    debugImage.src = '';
+    debugImage.classList.add('d-none');
+    if (debugBlobUrl) {
+        URL.revokeObjectURL(debugBlobUrl);
+        debugBlobUrl = null;
+    }
+    previewText.textContent = 'Extracted text will appear here...';
+    outputText.textContent = '';
+    groundTruthInput.value = '';
+    accuracy.textContent = '';
+    progressBar.style.width = '0%';
+    progressText.textContent = 'Waiting for image...';
+    timeEstimate.textContent = '';
+    processBtn.disabled = true;
+    copyBtn.style.display = 'none';
+    downloadBtn.style.display = 'none';
+    showNotification('All fields cleared', 'success');
+}
+
+function showNotification(message, type) {
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    setTimeout(() => {
+        notification.className = 'notification';
+    }, 3000);
+}

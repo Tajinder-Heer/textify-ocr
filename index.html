@@ -5,32 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Textify - Image to Text OCR</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Gurmukhi:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://unpkg.com/tesseract.js@v5.1.0/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.3/dist/tesseract.min.js"></script>
     <script src="preprocess.js" defer></script>
     <script src="ocr.js" defer></script>
     <script src="metrics.js" defer></script>
     <script src="main.js" defer></script>
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container">
+        <header>
+            <h1>Textify-OCR</h1>
+            <p class="subtitle">High Performance Punjabi Text Extraction</p>
+        </header>
+        
         <div class="card">
-            <div class="card-header"><h3>Textify: Image to Text OCR</h3></div>
-            <div class="card-body">
-                <p>Upload an image with Punjabi text to extract text.</p>
-                <input type="file" id="upload" accept="image/*" class="form-control mb-2">
-                <label class="form-check-label"><input type="checkbox" id="preprocess" checked class="form-check-input"> Enable Preprocessing</label>
-                <label class="form-check-label"><input type="checkbox" id="blur" class="form-check-input"> Apply Blur (slower, better for noisy images)</label>
-                <label class="form-check-label"><input type="checkbox" id="debug" class="form-check-input"> Show Preprocessed Image</label>
-                <textarea id="groundTruth" placeholder="Enter ground truth text for accuracy (optional)" class="form-control mb-2"></textarea>
-                <button id="process" class="btn btn-primary">Extract Text</button>
-                <div id="loading" class="mt-2 d-none">Processing... <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%;"></div></div></div>
-                <div id="error" class="alert alert-danger mt-2 d-none" role="alert"></div>
-                <img id="debugImage" class="img-fluid mt-2 d-none">
-                <div id="result" class="mt-2 p-3 border bg-light" style="white-space: pre-wrap;"></div>
-                <div id="accuracy" class="mt-2"></div>
+            <h2 class="card-title">Upload Image</h2>
+            <div class="upload-area" id="dropZone">
+                <i>📷</i>
+                <p>Drag & drop your Punjabi text image here or click to browse</p>
+                <button class="btn" id="browseBtn">Browse Files</button>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+            
+            <div class="form-check mb-3">
+                <input type="checkbox" id="preprocess" class="form-check-input" checked>
+                <label class="form-check-label" for="preprocess">Enable Preprocessing (recommended)</label>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" id="blur" class="form-check-input">
+                <label class="form-check-label" for="blur">Apply Blur (slower, better for noisy images)</label>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" id="debug" class="form-check-input">
+                <label class="form-check-label" for="debug">Show Preprocessed Image</label>
+            </div>
+            <textarea id="groundTruth" class="form-control mb-3" placeholder="Enter ground truth text for accuracy (optional)"></textarea>
+            
+            <div class="optimization-tips">
+                <h3>Tips for Better Results</h3>
+                <ul>
+                    <li>Use images with clear, high-contrast text</li>
+                    <li>Crop images to include only the text region</li>
+                    <li>Recommended resolution: 300 DPI</li>
+                    <li>File formats: PNG, JPG, or BMP</li>
+                    <li>Good lighting reduces processing time</li>
+                </ul>
+            </div>
+            
+            <button class="btn btn-process" id="processBtn" disabled>Process Image & Extract Text</button>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="status">
+                    <span id="progressText">Waiting for image...</span>
+                    <span id="timeEstimate"></span>
+                </div>
             </div>
         </div>
+        
+        <div class="card">
+            <h2 class="card-title">Preview</h2>
+            <div class="preview-container">
+                <div class="image-preview">
+                    <img id="previewImage" src="" alt="Your image will appear here">
+                    <img id="debugImage" src="" alt="Preprocessed image" class="d-none">
+                </div>
+                <div class="text-preview">
+                    <p id="previewText" class="panjabi-text">Extracted text will appear here...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card results">
+            <h2 class="card-title">Extracted Text</h2>
+            <div class="text-output panjabi-text" id="outputText"></div>
+            <div id="accuracy" class="mt-2"></div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-copy" id="copyBtn" style="display: none;">Copy Text</button>
+                <button class="btn btn-download" id="downloadBtn" style="display: none;">Download as Text</button>
+                <button class="btn btn-clear" id="clearBtn">Clear All</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Textify-OCR v2.1 | Optimized for Punjabi Text Extraction</p>
+        </footer>
     </div>
+
+    <div class="notification" id="notification"></div>
 </body>
 </html>
