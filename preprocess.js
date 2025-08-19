@@ -1,4 +1,4 @@
-function preprocessImage(file, callback) {
+function preprocessImage(file, callback, applyBlur) {
     const img = new Image();
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -7,12 +7,12 @@ function preprocessImage(file, callback) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // Cap image size (max 900px width)
+            // Cap image size (max 800px width)
             let scale = 1;
-            if (img.width > 900) {
-                scale = 900 / img.width;
+            if (img.width > 800) {
+                scale = 800 / img.width;
             } else if (img.width < 600) {
-                scale = 1.2; // Reduced from 1.5
+                scale = 1.1; // Reduced from 1.2
             }
             canvas.width = img.width * scale;
             canvas.height = img.height * scale;
@@ -30,7 +30,13 @@ function preprocessImage(file, callback) {
                 data[i] = data[i + 1] = data[i + 2] = avg;
             }
 
-            // Skip blur for faster processing
+            // Apply blur only if enabled
+            if (applyBlur) {
+                ctx.filter = 'blur(0.3px)';
+                ctx.putImageData(imageData, 0, 0);
+                ctx.filter = 'none';
+            }
+
             // Otsu's adaptive thresholding
             const threshold = otsuThreshold(imageData);
             for (let i = 0; i < data.length; i += 4) {
@@ -39,7 +45,10 @@ function preprocessImage(file, callback) {
             }
             ctx.putImageData(imageData, 0, 0);
 
-            canvas.toBlob(callback, 'image/png');
+            canvas.toBlob((blob) => {
+                console.log('Blob created:', blob ? blob.size : 'null');
+                callback(blob);
+            }, 'image/png');
         };
     };
     reader.readAsDataURL(file);

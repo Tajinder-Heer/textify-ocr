@@ -1,5 +1,6 @@
 const upload = document.getElementById('upload');
 const preprocessCheckbox = document.getElementById('preprocess');
+const blurCheckbox = document.getElementById('blur');
 const debugCheckbox = document.getElementById('debug');
 const groundTruthInput = document.getElementById('groundTruth');
 const processBtn = document.getElementById('process');
@@ -28,23 +29,41 @@ processBtn.addEventListener('click', async () => {
     debugImage.style.display = 'none';
 
     try {
+        console.time('Total Processing');
         let input = selectedFile;
         if (preprocessCheckbox.checked) {
-            input = await new Promise((resolve) => preprocessImage(selectedFile, resolve));
-            if (debugCheckbox.checked) {
-                debugImage.src = URL.createObjectURL(input);
-                debugImage.style.display = 'block';
+            console.time('Preprocessing');
+            input = await new Promise((resolve, reject) => {
+                preprocessImage(selectedFile, (blob) => {
+                    if (blob) {
+                        console.log('Preprocessing complete, blob size:', blob.size);
+                        resolve(blob);
+                    } else {
+                        reject(new Error('Preprocessing failed: No blob generated'));
+                    }
+                }, blurCheckbox.checked);
+            });
+            console.timeEnd('Preprocessing');
+            if (debugCheckbox.checked && input) {
+                setTimeout(() => {
+                    debugImage.src = URL.createObjectURL(input);
+                    debugImage.style.display = 'block';
+                    console.log('Debug image set');
+                }, 0);
             }
         }
+        console.time('OCR');
         const text = await performOCR(input, 'pan');
+        console.timeEnd('OCR');
         result.innerText = text || 'No text detected.';
         if (groundTruthInput.value) {
             const acc = calculateLevenshteinAccuracy(groundTruthInput.value, text);
             accuracy.innerText = `Accuracy: ${acc.toFixed(2)}%`;
         }
+        console.timeEnd('Total Processing');
     } catch (error) {
         console.error('Error:', error);
-        errorDiv.textContent = 'Error processing image. Check console for details.';
+        errorDiv.textContent = 'Error processing image: ' + error.message;
         errorDiv.classList.remove('d-none');
     } finally {
         loading.classList.add('d-none');

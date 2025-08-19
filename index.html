@@ -20,6 +20,7 @@
                 <p>Upload an image with Punjabi text to extract text.</p>
                 <input type="file" id="upload" accept="image/*" class="form-control mb-2">
                 <label class="form-check-label"><input type="checkbox" id="preprocess" checked class="form-check-input"> Enable Preprocessing</label>
+                <label class="form-check-label"><input type="checkbox" id="blur" class="form-check-input"> Apply Blur (slower)</label>
                 <label class="form-check-label"><input type="checkbox" id="debug" class="form-check-input"> Show Preprocessed Image</label>
                 <textarea id="groundTruth" placeholder="Enter ground truth text for accuracy (optional)" class="form-control mb-2"></textarea>
                 <button id="process" class="btn btn-primary">Extract Text</button>
