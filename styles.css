@@ -191,7 +191,6 @@ h1 {
     height: auto;
     display: block;
 }
-<<<<<<< HEAD
 
 .image-preview canvas {
     width: 100%;
@@ -271,78 +270,3 @@ footer {
         flex-direction: column;
     }
 }
-=======
-
-.text-preview {
-    flex: 1;
-    min-width: 300px;
-    background-color: var(--light-color);
-    border-radius: var(--border-radius);
-    padding: 20px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.results {
-    margin-top: 30px;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.btn-copy {
-    background-color: #a0d468;
-}
-
-.btn-download {
-    background-color: #4fc1e9;
-}
-
-.btn-clear {
-    background-color: #ed5565;
-}
-
-footer {
-    text-align: center;
-    margin-top: 40px;
-    padding: 20px;
-    color: var(--dark-color);
-    opacity: 0.7;
-}
-
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px 20px;
-    border-radius: var(--border-radius);
-    background-color: white;
-    box-shadow: var(--shadow);
-    transform: translateX(150%);
-    transition: transform 0.3s ease;
-    z-index: 1000;
-}
-
-.notification.success {
-    border-left: 4px solid var(--success-color);
-    transform: translateX(0);
-}
-
-.notification.error {
-    border-left: 4px solid var(--error-color);
-    transform: translateX(0);
-}
-
-@media (max-width: 768px) {
-    .preview-container {
-        flex-direction: column;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-    }
-}
->>>>>>> fd2235a51a82d11f8282c107d9eb2cde32d6f8e1
