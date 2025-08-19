@@ -20,7 +20,7 @@ Phase 2: Fixed Preprocessing (Complete)
 
 
 
-Features: Preprocessing (contrast +20%, Otsu’s, optional 0.3px blur, upscale), Tesseract.js OCR (PSM 6, OEM 1), Levenshtein accuracy, debug image.
+Features: Preprocessing (contrast +20%, Otsu’s, optional blur), Tesseract.js OCR (PSM 6, OEM 1), Levenshtein accuracy, debug image.
 
 
 
@@ -42,15 +42,15 @@ Modern UI with Bootstrap 5.3 (card layout, progress bar, alerts).
 
 
 
-Performance: Capped image size (600px), no upscale for small images, optional blur, single Tesseract worker, PSM 6, local pan.traineddata.
+Performance: Single Tesseract worker, PSM 4 (single text line), low DPI (100), local pan.traineddata, fallback to remote traineddata.
 
 
 
-Fixed debug image preview.
+Local worker.min.js and pan.traineddata to avoid latency.
 
 
 
-Local worker.min.js to avoid CORS.
+Debug image preview deferred for next phase.
 
 
 
@@ -70,11 +70,15 @@ Hosting: GitHub Pages (https://tajinder-heer.github.io/textify-ocr).
 
 
 
-Target: 80%+ accuracy, <5 sec/image.
+Target: 80%+ accuracy, <5 sec/image (ideally <2 sec for small images).
 
 Future Steps
 
 
+
+
+
+Fix debug image preview.
 
 
 
@@ -118,10 +122,6 @@ Test with Gurmukhi images (e.g., AnmolUni, Raavi fonts, <1MB).
 
 
 
-Check debug image for text clarity.
-
-
-
 Provide ground truth for accuracy.
 
 Testing Notes
@@ -130,16 +130,16 @@ Testing Notes
 
 
 
-Test with 10-15 Gurmukhi images (printed, mix clear/noisy, <1MB).
+Test with 10-15 Gurmukhi images (printed, mix clear/noisy, <1MB, e.g., 60 KB).
 
 
 
-Target: 80%+ accuracy, <5 sec/image.
+Target: 80%+ accuracy, <5 sec/image (ideally <2 sec for small images).
 
 
 
-Check console (F12 > Console) for timing logs and errors.
+Check console (F12 > Console) for timing logs (Total Processing, Tesseract Initialization, Tesseract Language Loading, Tesseract Recognition).
 
 
 
-Verify UI (responsive, modern) and debug image preview.
+Verify UI (responsive, modern).

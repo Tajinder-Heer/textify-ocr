@@ -23,6 +23,10 @@ processBtn.addEventListener('click', async () => {
         errorDiv.classList.remove('d-none');
         return;
     }
+    console.log('Preprocessing enabled:', preprocessCheckbox.checked);
+    console.log('Debug enabled:', debugCheckbox.checked);
+    console.log('Blur enabled:', blurCheckbox.checked);
+    console.log('Input image:', selectedFile.name, 'Size:', selectedFile.size, 'bytes', 'Type:', selectedFile.type);
     loading.classList.remove('d-none');
     errorDiv.classList.add('d-none');
     result.innerText = '';
@@ -38,6 +42,7 @@ processBtn.addEventListener('click', async () => {
         let input = selectedFile;
         if (preprocessCheckbox.checked) {
             console.time('Preprocessing');
+            console.log('Starting preprocessing for image:', selectedFile.name);
             input = await new Promise((resolve, reject) => {
                 preprocessImage(selectedFile, (blob) => {
                     if (blob && blob.size > 0) {
@@ -53,8 +58,10 @@ processBtn.addEventListener('click', async () => {
                 debugBlobUrl = URL.createObjectURL(input);
                 debugImage.src = debugBlobUrl;
                 debugImage.style.display = 'block';
-                debugImage.dispatchEvent(new Event('load')); // Force redraw
-                console.log('Debug image set, URL:', debugBlobUrl);
+                requestAnimationFrame(() => {
+                    debugImage.dispatchEvent(new Event('load'));
+                    console.log('Debug image set, URL:', debugBlobUrl);
+                });
             }
         }
         console.time('OCR');

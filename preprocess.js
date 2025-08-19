@@ -4,16 +4,18 @@ function preprocessImage(file, callback, applyBlur) {
     reader.onload = (e) => {
         img.src = e.target.result;
         img.onload = () => {
+            console.log('Image loaded, dimensions:', img.width, 'x', img.height);
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // Cap image size (max 600px width)
+            // Cap image size (max 500px width)
             let scale = 1;
-            if (img.width > 600) {
-                scale = 600 / img.width;
+            if (img.width > 500) {
+                scale = 500 / img.width;
             }
             canvas.width = img.width * scale;
             canvas.height = img.height * scale;
+            console.log('Canvas size:', canvas.width, 'x', canvas.height);
 
             // Contrast boost (+20%)
             ctx.filter = 'contrast(1.2)';
