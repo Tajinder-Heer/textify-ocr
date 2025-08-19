@@ -7,12 +7,10 @@ function preprocessImage(file, callback, applyBlur) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // Cap image size (max 800px width)
+            // Cap image size (max 600px width)
             let scale = 1;
-            if (img.width > 800) {
-                scale = 800 / img.width;
-            } else if (img.width < 600) {
-                scale = 1.1; // Reduced from 1.2
+            if (img.width > 600) {
+                scale = 600 / img.width;
             }
             canvas.width = img.width * scale;
             canvas.height = img.height * scale;
@@ -47,9 +45,18 @@ function preprocessImage(file, callback, applyBlur) {
 
             canvas.toBlob((blob) => {
                 console.log('Blob created:', blob ? blob.size : 'null');
-                callback(blob);
+                if (blob) {
+                    callback(blob);
+                } else {
+                    console.warn('Blob creation failed, using original file');
+                    callback(file);
+                }
             }, 'image/png');
         };
+    };
+    reader.onerror = () => {
+        console.warn('Image load failed, using original file');
+        callback(file);
     };
     reader.readAsDataURL(file);
 }

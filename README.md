@@ -42,7 +42,11 @@ Modern UI with Bootstrap 5.3 (card layout, progress bar, alerts).
 
 
 
-Performance: Capped image size (800px), reduced upscale (1.1x), optional blur, single Tesseract worker, PSM 3.
+Performance: Capped image size (600px), no upscale for small images, optional blur, single Tesseract worker, PSM 6, local pan.traineddata.
+
+
+
+Fixed debug image preview.
 
 
 
@@ -50,15 +54,11 @@ Local worker.min.js to avoid CORS.
 
 
 
-Debug image preview fixed.
-
-
-
 Tech: HTML, JS (Tesseract.js, Canvas API), Bootstrap, CSS.
 
 
 
-Structure: index.html, styles.css, main.js, preprocess.js, ocr.js, metrics.js, worker.min.js.
+Structure: index.html, styles.css, main.js, preprocess.js, ocr.js, metrics.js, worker.min.js, pan.traineddata.
 
 
 
@@ -102,7 +102,11 @@ Clone repo: https://github.com/Tajinder-Heer/textify-ocr.
 
 
 
-Add worker.min.js (download from https://unpkg.com/tesseract.js@v5.1.0/dist/worker.min.js).
+Add worker.min.js (from https://unpkg.com/tesseract.js@v5.1.0/dist/worker.min.js).
+
+
+
+Add pan.traineddata (from https://tessdata.projectnaptha.com/4.0.0/pan.traineddata).
 
 
 
@@ -110,7 +114,7 @@ Open index.html via GitHub Pages.
 
 
 
-Test with Gurmukhi images (e.g., AnmolUni, Raavi fonts, <2MB).
+Test with Gurmukhi images (e.g., AnmolUni, Raavi fonts, <1MB).
 
 
 
@@ -126,7 +130,7 @@ Testing Notes
 
 
 
-Test with 10-15 Gurmukhi images (printed, mix clear/noisy).
+Test with 10-15 Gurmukhi images (printed, mix clear/noisy, <1MB).
 
 
 
@@ -134,7 +138,7 @@ Target: 80%+ accuracy, <5 sec/image.
 
 
 
-Check console (F12 > Console) for errors.
+Check console (F12 > Console) for timing logs and errors.
 
 
 

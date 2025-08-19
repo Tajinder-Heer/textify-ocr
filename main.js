@@ -11,6 +11,7 @@ const errorDiv = document.getElementById('error');
 const debugImage = document.getElementById('debugImage');
 
 let selectedFile = null;
+let debugBlobUrl = null;
 
 upload.addEventListener('change', (e) => {
     selectedFile = e.target.files[0];
@@ -27,6 +28,10 @@ processBtn.addEventListener('click', async () => {
     result.innerText = '';
     accuracy.innerText = '';
     debugImage.style.display = 'none';
+    if (debugBlobUrl) {
+        URL.revokeObjectURL(debugBlobUrl);
+        debugBlobUrl = null;
+    }
 
     try {
         console.time('Total Processing');
@@ -35,21 +40,21 @@ processBtn.addEventListener('click', async () => {
             console.time('Preprocessing');
             input = await new Promise((resolve, reject) => {
                 preprocessImage(selectedFile, (blob) => {
-                    if (blob) {
+                    if (blob && blob.size > 0) {
                         console.log('Preprocessing complete, blob size:', blob.size);
                         resolve(blob);
                     } else {
-                        reject(new Error('Preprocessing failed: No blob generated'));
+                        reject(new Error('Preprocessing failed: Invalid blob'));
                     }
                 }, blurCheckbox.checked);
             });
             console.timeEnd('Preprocessing');
             if (debugCheckbox.checked && input) {
-                setTimeout(() => {
-                    debugImage.src = URL.createObjectURL(input);
-                    debugImage.style.display = 'block';
-                    console.log('Debug image set');
-                }, 0);
+                debugBlobUrl = URL.createObjectURL(input);
+                debugImage.src = debugBlobUrl;
+                debugImage.style.display = 'block';
+                debugImage.dispatchEvent(new Event('load')); // Force redraw
+                console.log('Debug image set, URL:', debugBlobUrl);
             }
         }
         console.time('OCR');
